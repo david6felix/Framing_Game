@@ -376,35 +376,35 @@ Game to understand camera framing
                 id: 'ECU',
                 name: 'Extreme Close-Up',
                 desc: 'Focuses intensely on a single detail or feature (e.g., eyes) to convey strong emotion or key details.',
-                imgUrl: 'images/resize-uploaded-image (1).jpeg',
+                imgUrl: 'images/ECU1.jpg',
                 draw: drawECU
             },
             {
                 id: 'CU',
                 name: 'Close-Up',
                 desc: 'Frames the head and shoulders, emphasizing facial expression and emotional state.',
-                imgUrl: 'images/Wonder_Woman_close_up_16_9.width-1431.jpg',
+                imgUrl: 'images/CU1.jpg',
                 draw: drawCU
             },
             {
                 id: 'MS',
                 name: 'Medium Shot',
                 desc: 'Frames the subject from roughly the waist up, balancing character emotion with surroundings.',
-                imgUrl: 'images/Camera-Shot-Guide-Cowboy-Shot-Wonder-Woman-StudioBinder.jpeg',
+                imgUrl: 'images/MS1.jpeg',
                 draw: drawMS
             },
             {
                 id: 'LS',
                 name: 'Long Shot',
                 desc: 'Displays the full human body top-to-bottom within its immediate environment.',
-                imgUrl: 'images/Camera-Shot-Guide-Full-Shot-2-Django-Unchained-StudioBinder.jpg',
+                imgUrl: 'images/LS1.jpg',
                 draw: drawLS
             },
             {
                 id: 'ELS',
                 name: 'Extreme Long Shot',
                 desc: 'Emphasizes scale and landscape; human figures appear tiny or distant in the environment.',
-                imgUrl: 'images/Into_the_Wild_long_shot_2.width-1431.png',
+                imgUrl: 'images/ELS1.jpeg',
                 draw: drawELS
             }
         ];

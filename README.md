@@ -407,6 +407,41 @@ Game to understand camera framing
                 imgUrl: 'images/ELS1.jpeg',
                 draw: drawELS
             }
+                        {
+                id: 'ECU',
+                name: 'Extreme Close-Up',
+                desc: 'Focuses intensely on a single detail or feature (e.g., eyes) to convey strong emotion or key details.',
+                imgUrl: 'images/ECU2.jpeg',
+                draw: drawECU
+            },
+            {
+                id: 'CU',
+                name: 'Close-Up',
+                desc: 'Frames the head and shoulders, emphasizing facial expression and emotional state.',
+                imgUrl: 'images/CU2.jpeg',
+                draw: drawCU
+            },
+            {
+                id: 'MS',
+                name: 'Medium Shot',
+                desc: 'Frames the subject from roughly the waist up, balancing character emotion with surroundings.',
+                imgUrl: 'images/MS2.jpg',
+                draw: drawMS
+            },
+            {
+                id: 'LS',
+                name: 'Long Shot',
+                desc: 'Displays the full human body top-to-bottom within its immediate environment.',
+                imgUrl: 'images/LS2.jpeg',
+                draw: drawLS
+            },
+            {
+                id: 'ELS',
+                name: 'Extreme Long Shot',
+                desc: 'Emphasizes scale and landscape; human figures appear tiny or distant in the environment.',
+                imgUrl: 'images/ELS2.png',
+                draw: drawELS
+            }
         ];
 
         let currentQuestionIndex = 0;

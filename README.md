@@ -486,42 +486,51 @@ Game to understand camera framing
             canAnswer = true;
             document.getElementById('feedback').innerText = 'Select the matching shot size for the frame above.';
             document.getElementById('round-num').innerText = currentQuestionIndex + 1;
-
+        
             const currentData = activeQuestions[currentQuestionIndex];
             
+            // Clear canvas before drawing
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+        
             if (currentData.imgUrl) {
                 const img = new Image();
-                img.src = currentData.imgUrl;
+                // Cross-origin attribute helps prevent canvas tainting issues if using external links
+                img.crossOrigin = "anonymous"; 
+                
                 img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 };
-                img.onerror = () => {
+                
+                img.onerror = (err) => {
+                    console.warn(`Failed to load image at ${currentData.imgUrl}. Falling back to procedural drawing.`, err);
                     currentData.draw(ctx, canvas.width, canvas.height);
                 };
+        
+                // Set src AFTER defining onload/onerror handlers
+                img.src = currentData.imgUrl;
             } else {
                 currentData.draw(ctx, canvas.width, canvas.height);
             }
-
+        
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
-
+        
             const choices = [...SHOT_TYPES].sort(() => Math.random() - 0.5);
-
+        
             choices.forEach(type => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-option';
                 btn.innerText = type.name;
                 btn.onclick = () => {
-                    initAudio(); // Start AudioContext on user interaction
+                    initAudio();
                     startBackgroundMusic();
                     checkAnswer(type.id, btn);
                 };
                 optionsContainer.appendChild(btn);
             });
         }
-
+        
         function checkAnswer(selectedId, btn) {
             if (!canAnswer) return;
             canAnswer = false;

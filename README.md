@@ -406,8 +406,8 @@ Game to understand camera framing
                 desc: 'Emphasizes scale and landscape; human figures appear tiny or distant in the environment.',
                 imgUrl: 'images/ELS1.jpeg',
                 draw: drawELS
-            }
-                        {
+            },
+            {
                 id: 'ECU',
                 name: 'Extreme Close-Up',
                 desc: 'Focuses intensely on a single detail or feature (e.g., eyes) to convey strong emotion or key details.',
@@ -521,15 +521,14 @@ Game to understand camera framing
             canAnswer = true;
             document.getElementById('feedback').innerText = 'Select the matching shot size for the frame above.';
             document.getElementById('round-num').innerText = currentQuestionIndex + 1;
-        
+            
             const currentData = activeQuestions[currentQuestionIndex];
             
             // Clear canvas before drawing
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
+            
             if (currentData.imgUrl) {
                 const img = new Image();
-                // Cross-origin attribute helps prevent canvas tainting issues if using external links
                 img.crossOrigin = "anonymous"; 
                 
                 img.onload = () => {
@@ -541,18 +540,17 @@ Game to understand camera framing
                     console.warn(`Failed to load image at ${currentData.imgUrl}. Falling back to procedural drawing.`, err);
                     currentData.draw(ctx, canvas.width, canvas.height);
                 };
-        
-                // Set src AFTER defining onload/onerror handlers
+                
                 img.src = currentData.imgUrl;
             } else {
                 currentData.draw(ctx, canvas.width, canvas.height);
             }
-        
+            
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
-        
+            
             const choices = [...SHOT_TYPES].sort(() => Math.random() - 0.5);
-        
+            
             choices.forEach(type => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-option';
@@ -565,7 +563,7 @@ Game to understand camera framing
                 optionsContainer.appendChild(btn);
             });
         }
-        
+
         function checkAnswer(selectedId, btn) {
             if (!canAnswer) return;
             canAnswer = false;

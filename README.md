@@ -233,6 +233,21 @@ Game to understand camera framing
             padding-top: 10px;
             margin-top: 10px;
         }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-download {
+            background-color: #1976d2 !important;
+            border-color: #2196f3 !important;
+        }
+
+        .btn-download:hover {
+            background-color: #1565c0 !important;
+        }
     </style>
 </head>
 <body>
@@ -275,7 +290,10 @@ Game to understand camera framing
                 <div>Time Bonus: <strong id="modal-bonus-score">0</strong></div>
                 <div class="final-score">TOTAL SCORE: <span id="modal-total-score">0</span></div>
             </div>
-            <button class="btn-option" style="width: 100%; background: var(--accent-color);" onclick="closeModalAndRestart()">Play Again</button>
+            <div class="modal-actions">
+                <button class="btn-option btn-download" onclick="downloadScoreImage()">📸 Download Score Card</button>
+                <button class="btn-option" style="background: var(--accent-color);" onclick="closeModalAndRestart()">Play Again</button>
+            </div>
         </div>
     </div>
 
@@ -294,7 +312,6 @@ Game to understand camera framing
             }
         }
 
-        // Play Success Sound (Upward Chime)
         function playSuccessSound() {
             if (!audioCtx) return;
             const now = audioCtx.currentTime;
@@ -316,7 +333,6 @@ Game to understand camera framing
             osc.stop(now + 0.5);
         }
 
-        // Play Fail Sound (Downward Buzz)
         function playFailSound() {
             if (!audioCtx) return;
             const now = audioCtx.currentTime;
@@ -336,12 +352,11 @@ Game to understand camera framing
             osc.stop(now + 0.35);
         }
 
-        // Synthesized Background Chiptune Loop
         function startBackgroundMusic() {
             if (isMusicPlaying) return;
             isMusicPlaying = true;
 
-            const notes = [261.63, 329.63, 392.00, 329.63, 293.66, 349.23, 440.00, 349.23]; // Simple loop melody
+            const notes = [261.63, 329.63, 392.00, 329.63, 293.66, 349.23, 440.00, 349.23];
             let step = 0;
 
             musicTimer = setInterval(() => {
@@ -353,7 +368,7 @@ Game to understand camera framing
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(notes[step % notes.length], now);
 
-                gain.gain.setValueAtTime(0.02, now); // Soft background volume
+                gain.gain.setValueAtTime(0.02, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
 
                 osc.connect(gain);
@@ -362,7 +377,7 @@ Game to understand camera framing
                 osc.stop(now + 0.2);
 
                 step++;
-            }, 250); // 120 BPM tempo
+            }, 250);
         }
 
         function stopBackgroundMusic() {
@@ -449,6 +464,7 @@ Game to understand camera framing
         let correctAnswersCount = 0;
         let activeQuestions = [];
         let canAnswer = true;
+        let calculatedTotalScore = 0;
 
         // Timecode Variables
         let startTime = 0;
@@ -524,7 +540,6 @@ Game to understand camera framing
             
             const currentData = activeQuestions[currentQuestionIndex];
             
-            // Clear canvas before drawing
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             if (currentData.imgUrl) {
@@ -549,9 +564,20 @@ Game to understand camera framing
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
             
-            const choices = [...SHOT_TYPES].sort(() => Math.random() - 0.5);
+            // Generate UNIQUE option buttons only (1 button per shot type name)
+            const uniqueTypes = [];
+            const map = new Map();
+            for (const item of SHOT_TYPES) {
+                if(!map.has(item.id)){
+                    map.set(item.id, true);
+                    uniqueTypes.push(item);
+                }
+            }
             
-            choices.forEach(type => {
+            // Shuffle unique option buttons
+            uniqueTypes.sort(() => Math.random() - 0.5);
+            
+            uniqueTypes.forEach(type => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-option';
                 btn.innerText = type.name;
@@ -587,7 +613,6 @@ Game to understand camera framing
                 playFailSound();
             }
 
-            // Pause briefly (1.8 seconds) so player sees result, then proceed automatically
             setTimeout(() => {
                 if (currentQuestionIndex < activeQuestions.length - 1) {
                     currentQuestionIndex++;
@@ -605,13 +630,13 @@ Game to understand camera framing
 
             const elapsedSeconds = Math.floor(elapsedMilliseconds / 1000);
             const timeBonus = Math.max(0, 500 - (elapsedSeconds * 10));
-            const totalScore = score + timeBonus;
+            calculatedTotalScore = score + timeBonus;
 
             document.getElementById('modal-correct').innerText = `${correctAnswersCount} / ${activeQuestions.length}`;
             document.getElementById('modal-time').innerText = formatTimecode(elapsedMilliseconds);
             document.getElementById('modal-base-score').innerText = score;
             document.getElementById('modal-bonus-score').innerText = timeBonus;
-            document.getElementById('modal-total-score').innerText = totalScore;
+            document.getElementById('modal-total-score').innerText = calculatedTotalScore;
 
             document.getElementById('score-modal').classList.add('active');
         }
@@ -621,8 +646,106 @@ Game to understand camera framing
             initGame();
         }
 
-        // --- Procedural Scene Drawings ---
+        // --- Render and Download Score Certificate Image ---
+        function downloadScoreImage() {
+            const offscreenCanvas = document.createElement('canvas');
+            offscreenCanvas.width = 600;
+            offscreenCanvas.height = 700;
+            const octx = offscreenCanvas.getContext('2d');
 
+            // Card Background
+            octx.fillStyle = '#1e1e1e';
+            octx.fillRect(0, 0, 600, 700);
+
+            // Red Border Highlight
+            octx.strokeStyle = '#e50914';
+            octx.lineWidth = 10;
+            octx.strokeRect(15, 15, 570, 670);
+
+            // Title Header
+            octx.fillStyle = '#e50914';
+            octx.font = 'bold 36px "Segoe UI", sans-serif';
+            octx.textAlign = 'center';
+            octx.fillText('DIRECTOR\'S LENS', 300, 80);
+
+            octx.fillStyle = '#aaaaaa';
+            octx.font = '18px "Segoe UI", sans-serif';
+            octx.fillText('Production Score Certificate', 300, 115);
+
+            // Decorative Line
+            octx.strokeStyle = '#444444';
+            octx.lineWidth = 2;
+            octx.beginPath();
+            octx.moveTo(60, 140);
+            octx.lineTo(540, 140);
+            octx.stroke();
+
+            // Stats Inner Box
+            octx.fillStyle = '#111111';
+            octx.fillRect(60, 170, 480, 280);
+            octx.strokeStyle = '#333333';
+            octx.strokeRect(60, 170, 480, 280);
+
+            // Stats Text Formatting
+            octx.textAlign = 'left';
+            octx.fillStyle = '#ffffff';
+            octx.font = '20px "Segoe UI", sans-serif';
+
+            const timeStr = formatTimecode(elapsedMilliseconds);
+            const elapsedSeconds = Math.floor(elapsedMilliseconds / 1000);
+            const bonusStr = Math.max(0, 500 - (elapsedSeconds * 10));
+
+            octx.fillText(`Correct Shots:`, 100, 220);
+            octx.textAlign = 'right';
+            octx.fillText(`${correctAnswersCount} / ${activeQuestions.length}`, 500, 220);
+
+            octx.textAlign = 'left';
+            octx.fillText(`Elapsed Timecode:`, 100, 270);
+            octx.textAlign = 'right';
+            octx.fillText(timeStr, 500, 270);
+
+            octx.textAlign = 'left';
+            octx.fillText(`Accuracy Score:`, 100, 320);
+            octx.textAlign = 'right';
+            octx.fillText(`${score}`, 500, 320);
+
+            octx.textAlign = 'left';
+            octx.fillText(`Time Bonus:`, 100, 370);
+            octx.textAlign = 'right';
+            octx.fillText(`+${bonusStr}`, 500, 370);
+
+            // Divider in stats
+            octx.strokeStyle = '#333';
+            octx.beginPath();
+            octx.moveTo(80, 400);
+            octx.lineTo(520, 400);
+            octx.stroke();
+
+            // Total Score
+            octx.fillStyle = '#4caf50';
+            octx.font = 'bold 36px "Segoe UI", sans-serif';
+            octx.textAlign = 'center';
+            octx.fillText(`TOTAL SCORE: ${calculatedTotalScore}`, 300, 520);
+
+            // Date Badge & Seal
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            octx.fillStyle = '#888888';
+            octx.font = '16px "Segoe UI", sans-serif';
+            octx.fillText(`Wrapped on: ${dateStr}`, 300, 580);
+
+            octx.fillStyle = '#e50914';
+            octx.font = 'bold 18px monospace';
+            octx.fillText('OFFICIAL WRAP CERTIFICATE', 300, 630);
+
+            // Trigger Download
+            const link = document.createElement('a');
+            link.download = `directors-lens-score-${calculatedTotalScore}.png`;
+            link.href = offscreenCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // --- Procedural Fallback Drawings ---
         function drawBackground(ctx, width, height) {
             const grad = ctx.createLinearGradient(0, 0, 0, height);
             grad.addColorStop(0, '#2c3e50');
